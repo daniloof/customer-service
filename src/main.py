@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.adapters.inbound.rest.custimer_routes import router
+from src.adapters.inbound.rest.customer_routes import router
 from contextlib import asynccontextmanager
 from src.infrastructure.db.init_db import test_db_connection
 

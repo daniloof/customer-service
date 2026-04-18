@@ -1,7 +1,7 @@
 from src.infrastructure.db.session import SessionLocal
 from src.adapters.outbound.db.models import CustomerModel
 
-def create_customer (name: str, email: str):
+def create_customer(name:str, email:str):
     db = SessionLocal()
 
     try:
