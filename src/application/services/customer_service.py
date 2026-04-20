@@ -1,19 +1,9 @@
-from src.infrastructure.db.session import SessionLocal
-from src.adapters.outbound.db.models import CustomerModel
+from sqlalchemy.orm import Session
+from src.adapters.outbound.db.customer_repository import (create_customer as repo_create_customer,
+                                                          get_customers as repo_get_customers)
 
-def create_customer(name:str, email:str):
-    db = SessionLocal()
+def create_customer(db:Session, name:str, email:str):
+    return repo_create_customer(db, name, email)
 
-    try:
-        customer = CustomerModel(
-            name=name,
-            email=email
-        )
-
-        db.add(customer)
-        db.commit()
-        db.refresh(customer)
-
-        return customer
-    finally:
-        db.close()
+def get_customer(db: Session):
+    return repo_get_customers(db)
