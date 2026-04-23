@@ -3,8 +3,9 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from src.infrastructure.db.dependencies import get_db
-from src.application.services.customer_service import create_customer
-from src.adapters.inbound.rest.schemas import CustomerCreateRequest, CustomerResponse
+from src.adapters.outbound.db.customer_repository_impl import CustomerRepositoryImpl
+from src.application.services.customer_service import CustomerService
+from src.adapters.inbound.rest.schemas import CustomerResponse, CustomerCreateRequest
 from src.domain.exceptions import EmailAlreadyExistsError
 
 router = APIRouter()
@@ -12,21 +13,19 @@ router = APIRouter()
 @router.post("/customers", response_model=CustomerResponse)
 def create_customer_route(data: CustomerCreateRequest,
                           db: Session = Depends(get_db)):
+    service = CustomerService(CustomerRepositoryImpl(db))
+    
     try:
-        customer = create_customer(
-            db=db,
-            name=data.name,
-            email=data.email
-        )
+        result = service.create_customer(data.name, data.email)
 
-        return CustomerResponse(
-            id=str(customer.id),
-            name=customer.name,
-            email=customer.email
-        )
+        return CustomerResponse.model_validate(result)
+    
     except EmailAlreadyExistsError:
         raise HTTPException(status_code=409,detail=str("Email already exists"))
 
-@router.get("/health")
-def health():
-    return{"status": "OK"}
+@router.get("/customers", response_model=list[CustomerResponse])
+def list_customer_route(db:Session = Depends(get_db)):
+    service = CustomerService(CustomerRepositoryImpl(db))
+    customers = service.list_customer()
+
+    return [CustomerResponse.model_validate(c) for c in customers]

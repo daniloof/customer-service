@@ -1,9 +1,27 @@
-from sqlalchemy.orm import Session
-from src.adapters.outbound.db.customer_repository import (create_customer as repo_create_customer,
-                                                          get_customers as repo_get_customers)
+from src.domain.ports.customer_repository import CustomerRepository
+from src.application.dto.customer_dto import CustomerDTO
 
-def create_customer(db:Session, name:str, email:str):
-    return repo_create_customer(db, name, email)
+class CustomerService:
+    def __init__(self, repository:CustomerRepository):
+        self.repository = repository
 
-def get_customer(db: Session):
-    return repo_get_customers(db)
+    def create_customer(self, name: str, email: str):
+        customer = self.repository.create(name, email)
+
+        return CustomerDTO(
+        id=customer.id,
+        name=customer.name,
+        email=customer.email
+    )
+    
+    def list_customer(self):
+        customers = self.repository.list()
+
+        return [
+            CustomerDTO(
+                id=c.id,
+                name=c.name,
+                email=c.email
+            )
+            for c in customers
+        ]
