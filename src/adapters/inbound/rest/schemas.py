@@ -11,3 +11,20 @@ class CustomerResponse(BaseModel):
     email: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class AddressCreateRequest(BaseModel):
+    customer_id: UUID
+    street: str
+    city: str
+    state: str
+    zip_code: str
+
+class AddressResponse(BaseModel):
+    id: UUID
+    customer_id: UUID
+    street: str
+    city: str
+    state: str
+    zip_code: str
+
+    model_config = ConfigDict(from_attributes=True)

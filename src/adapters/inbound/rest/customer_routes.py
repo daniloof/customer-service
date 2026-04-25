@@ -10,7 +10,7 @@ from src.domain.exceptions import EmailAlreadyExistsError
 
 router = APIRouter()
 
-@router.post("/customers", response_model=CustomerResponse)
+@router.post("/customers", response_model=CustomerResponse, summary="Create a new customer")
 def create_customer_route(data: CustomerCreateRequest,
                           db: Session = Depends(get_db)):
     service = CustomerService(CustomerRepositoryImpl(db))
@@ -23,7 +23,7 @@ def create_customer_route(data: CustomerCreateRequest,
     except EmailAlreadyExistsError:
         raise HTTPException(status_code=409,detail=str("Email already exists"))
 
-@router.get("/customers", response_model=list[CustomerResponse])
+@router.get("/customers", response_model=list[CustomerResponse], summary="List all customers")
 def list_customer_route(db:Session = Depends(get_db)):
     service = CustomerService(CustomerRepositoryImpl(db))
     customers = service.list_customer()
