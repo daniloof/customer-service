@@ -9,3 +9,7 @@ class CustomerRepository (ABC):
     @abstractmethod
     def list(self) -> List:
         pass
+
+    @abstractmethod
+    def get_by_id(self, customer_id):
+        pass

@@ -16,7 +16,7 @@ class AddressRepositoryImpl(AddressRepository):
             zip_code=zip_code
         )
         self.db.add(address)
-        self.db.commit()
+        self.db.flush()  # Ensure the address gets an ID before refreshing
         self.db.refresh(address)
 
         return to_domain(address)

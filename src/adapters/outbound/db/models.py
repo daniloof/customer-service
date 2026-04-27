@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 class AddressModel(Base):
-    __tablename__ = "adresses"
+    __tablename__ = "addresses"
     
     id = Column(UUID(as_uuid=True),primary_key=True,default=uuid.uuid4)
     customer_id = Column(UUID(as_uuid=True),ForeignKey("customers.id"),nullable=False)
@@ -20,7 +20,7 @@ class AddressModel(Base):
     zip_code = Column(String,nullable=False)
     created_at = Column(DateTime(timezone=True),server_default=func.now())
 
-    customer = relationship("CustomerModel",back_populates="adresses")
+    customer = relationship("CustomerModel",back_populates="addresses")
 
     
 class CustomerModel(Base):
@@ -31,4 +31,4 @@ class CustomerModel(Base):
     email = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime(timezone=True),server_default=func.now())
 
-    adresses = relationship("AddressModel",back_populates="customer")
+    addresses = relationship("AddressModel",back_populates="customer", cascade="all, delete-orphan")

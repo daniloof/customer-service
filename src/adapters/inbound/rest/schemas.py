@@ -12,13 +12,12 @@ class CustomerResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-class AddressCreateRequest(BaseModel):
-    customer_id: UUID
+class CustomerAddressCreateRequest(BaseModel):
     street: str
     city: str
     state: str
     zip_code: str
-
+    
 class AddressResponse(BaseModel):
     id: UUID
     customer_id: UUID
