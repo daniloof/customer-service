@@ -1,4 +1,4 @@
-from src.domain.entities.address import Address
+from src.domain.entities import Address
 from src.adapters.outbound.db.models import AddressModel
 
 def to_domain(model: AddressModel) -> Address:

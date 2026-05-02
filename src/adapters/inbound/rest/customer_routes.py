@@ -13,7 +13,7 @@ from src.adapters.inbound.rest.schemas import ( CustomerResponse,
                                                 AddressResponse,
                                                 CustomerAddressCreateRequest,
                                                 CustomerDetailResponse)
-from src.domain.exceptions import EmailAlreadyExistsError
+from src.domain.exceptions import (EmailAlreadyExistsError, CustomerNotFoundError)
 from src.infrastructure.db.unit_of_work import UnitOfWork
 
 router = APIRouter()
@@ -33,10 +33,10 @@ def create_customer_route(
 
         return CustomerResponse.model_validate(result)
 
-    except EmailAlreadyExistsError:
+    except EmailAlreadyExistsError as e:
         raise HTTPException(
             status_code=409,
-            detail="Email already exists"
+            detail=str(e)
         )
 
 @router.get("/customers", response_model=list[CustomerResponse], summary="List all customers")

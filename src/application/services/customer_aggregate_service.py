@@ -1,6 +1,7 @@
-from src.domain.entities.address import Address
+from src.domain.entities import Address
 from src.domain.ports.customer_repository import CustomerRepository
 from src.domain.ports.address_repository import AddressRepository
+from src.domain.exceptions import CustomerNotFoundError
 
 class CustomerAggregateService:
     def __init__(
@@ -21,8 +22,7 @@ class CustomerAggregateService:
         customer = self.customer_repository.get_by_id(customer_id)
 
         if not customer:
-            raise ValueError("Customer not found")
-                    # Create the address and associate it with the customer
+            raise CustomerNotFoundError(customer_id)
             
         address = Address(
             id=None,

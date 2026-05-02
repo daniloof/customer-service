@@ -1,4 +1,4 @@
-from src.domain.entities.customer import Customer
+from src.domain.entities import Customer
 from src.adapters.outbound.db.models import CustomerModel
 from src.adapters.outbound.db.mappers.address_mapper import to_domain as address_to_domain
 

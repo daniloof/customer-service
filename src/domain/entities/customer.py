@@ -1,5 +1,5 @@
 from uuid import UUID
-from src.domain.entities.address import Address
+from .address import Address
 
 class Customer:
     def __init__(self, id: UUID, name: str, email: str, addresses: None):

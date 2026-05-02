@@ -1,5 +1,6 @@
 from src.domain.ports.customer_repository import CustomerRepository
 from src.application.dto.customer_dto import CustomerDTO
+from src.domain.exceptions import CustomerNotFoundError
 
 class CustomerService:
     def __init__(
@@ -33,6 +34,6 @@ class CustomerService:
         customer = self.repository.get_by_id(customer_id)
 
         if not customer:
-            raise ValueError("Customer not found")
+            raise CustomerNotFoundError(customer_id)
 
         return customer
