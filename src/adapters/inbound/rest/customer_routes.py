@@ -11,7 +11,8 @@ from src.application.services.customer_aggregate_service import CustomerAggregat
 from src.adapters.inbound.rest.schemas import ( CustomerResponse,
                                                 CustomerCreateRequest,
                                                 AddressResponse,
-                                                CustomerAddressCreateRequest)
+                                                CustomerAddressCreateRequest,
+                                                CustomerDetailResponse)
 from src.domain.exceptions import EmailAlreadyExistsError
 from src.infrastructure.db.unit_of_work import UnitOfWork
 
@@ -45,8 +46,7 @@ def list_customer_route(db:Session = Depends(get_db)):
 
     return [CustomerResponse.model_validate(c) for c in customers]
 
-@router.post("/customers/{customer_id}/address",
-             summary="Add an address to a customer",response_model=AddressResponse)
+@router.post("/customers/{customer_id}/address", summary="Add an address to a customer",response_model=AddressResponse)
 def add_address(customer_id: UUID, data: CustomerAddressCreateRequest, db: Session = Depends(get_db)):
     customer_repository = CustomerRepositoryImpl(db)
     address_repository = AddressRepositoryImpl(db)
@@ -63,3 +63,10 @@ def add_address(customer_id: UUID, data: CustomerAddressCreateRequest, db: Sessi
         )
 
     return AddressResponse.model_validate(result)
+
+@router.get("/customers/{customer_id}", response_model=CustomerDetailResponse, summary="Get customer by id")
+def get_customer_route(customer_id: UUID, db: Session = Depends(get_db)):
+    service = CustomerService(CustomerRepositoryImpl(db))
+    customer= service.get_customer(customer_id)
+
+    return CustomerDetailResponse.model_validate(customer)

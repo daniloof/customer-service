@@ -27,3 +27,11 @@ class AddressResponse(BaseModel):
     zip_code: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class CustomerDetailResponse(BaseModel):
+    id: UUID
+    name: str
+    email: str
+    addresses: list[AddressResponse]
+
+    model_config = ConfigDict(from_attributes=True)

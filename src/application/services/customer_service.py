@@ -28,3 +28,11 @@ class CustomerService:
             )
             for c in customers
         ]
+    
+    def get_customer(self, customer_id):
+        customer = self.repository.get_by_id(customer_id)
+
+        if not customer:
+            raise ValueError("Customer not found")
+
+        return customer
