@@ -7,6 +7,7 @@ from src.infrastructure.db.dependencies import get_db
 from src.adapters.outbound.db.customer_repository_impl import CustomerRepositoryImpl
 from src.adapters.outbound.db.address_repository_impl import AddressRepositoryImpl
 from src.application.services.customer_service import CustomerService
+from src.application.services.customer_aggregate_service import CustomerAggregateService
 from src.adapters.inbound.rest.schemas import ( CustomerResponse,
                                                 CustomerCreateRequest,
                                                 AddressResponse,
@@ -22,8 +23,7 @@ def create_customer_route(
     db: Session = Depends(get_db)
 ):
     service = CustomerService(
-        CustomerRepositoryImpl(db),
-        AddressRepositoryImpl(db)
+        CustomerRepositoryImpl(db)
     )
 
     try:
@@ -40,7 +40,7 @@ def create_customer_route(
 
 @router.get("/customers", response_model=list[CustomerResponse], summary="List all customers")
 def list_customer_route(db:Session = Depends(get_db)):
-    service = CustomerService(CustomerRepositoryImpl(db), AddressRepositoryImpl(db))
+    service = CustomerService(CustomerRepositoryImpl(db))
     customers = service.list_customer()
 
     return [CustomerResponse.model_validate(c) for c in customers]
@@ -50,7 +50,7 @@ def list_customer_route(db:Session = Depends(get_db)):
 def add_address(customer_id: UUID, data: CustomerAddressCreateRequest, db: Session = Depends(get_db)):
     customer_repository = CustomerRepositoryImpl(db)
     address_repository = AddressRepositoryImpl(db)
-    service = CustomerService(customer_repository, address_repository)
+    service = CustomerAggregateService(customer_repository, address_repository)
 
     with UnitOfWork(db):
 
