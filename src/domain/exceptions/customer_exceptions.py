@@ -1,8 +1,8 @@
 from .base import DomainError
 
 class EmailAlreadyExistsError(DomainError):
-    """Raised when trying to create a customer with an email that already exists."""
-    pass
+    def __init__(self, email):
+        super().__init__(f"Email already exists: {email}")
 
 class CustomerNotFoundError(DomainError):
     """Raised when a customer is not found."""

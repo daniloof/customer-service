@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -13,7 +12,6 @@ from src.adapters.inbound.rest.schemas import ( CustomerResponse,
                                                 AddressResponse,
                                                 CustomerAddressCreateRequest,
                                                 CustomerDetailResponse)
-from src.domain.exceptions import (EmailAlreadyExistsError, CustomerNotFoundError)
 from src.infrastructure.db.unit_of_work import UnitOfWork
 
 router = APIRouter()
@@ -27,17 +25,10 @@ def create_customer_route(
         CustomerRepositoryImpl(db)
     )
 
-    try:
-        with UnitOfWork(db):
-            result = service.create_customer(data.name, data.email)
+    with UnitOfWork(db):
+        result = service.create_customer(data.name, data.email)
 
-        return CustomerResponse.model_validate(result)
-
-    except EmailAlreadyExistsError as e:
-        raise HTTPException(
-            status_code=409,
-            detail=str(e)
-        )
+    return CustomerResponse.model_validate(result)
 
 @router.get("/customers", response_model=list[CustomerResponse], summary="List all customers")
 def list_customer_route(db:Session = Depends(get_db)):
@@ -46,7 +37,7 @@ def list_customer_route(db:Session = Depends(get_db)):
 
     return [CustomerResponse.model_validate(c) for c in customers]
 
-@router.post("/customers/{customer_id}/address", summary="Add an address to a customer",response_model=AddressResponse)
+@router.post("/customers/{customer_id}/addresses", summary="Add an address to a customer",response_model=AddressResponse)
 def add_address(customer_id: UUID, data: CustomerAddressCreateRequest, db: Session = Depends(get_db)):
     customer_repository = CustomerRepositoryImpl(db)
     address_repository = AddressRepositoryImpl(db)

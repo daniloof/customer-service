@@ -1,7 +1,7 @@
 from src.domain.entities import Address
 from src.domain.ports.customer_repository import CustomerRepository
 from src.domain.ports.address_repository import AddressRepository
-from src.domain.exceptions import CustomerNotFoundError
+from src.domain.exceptions import CustomerNotFoundError, InvalidZipCodeError
 
 class CustomerAggregateService:
     def __init__(
@@ -33,6 +33,11 @@ class CustomerAggregateService:
             zip_code=zip_code
         )
 
+        clean_zip_code = zip_code.replace("-", "")
+
+        if not clean_zip_code.isdigit() or len(clean_zip_code) != 8:
+            raise InvalidZipCodeError(zip_code)
+        
         customer.add_address(address)
 
         saved = self.address_repository.create(customer_id,

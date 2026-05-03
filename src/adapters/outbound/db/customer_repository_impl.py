@@ -19,7 +19,7 @@ class CustomerRepositoryImpl(CustomerRepository):
             return to_domain(customer)
         except IntegrityError as e:
             if "unique" in str(e.orig).lower():
-                raise EmailAlreadyExistsError()
+                raise EmailAlreadyExistsError(email)
             raise
 
     def list(self):

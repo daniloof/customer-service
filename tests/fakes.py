@@ -2,11 +2,11 @@ from src.domain.entities import Customer, Address
 
 class FakeCustomerRepository:
     def __init__(self):
-        self.customers = {}
+        self.customers = []
 
     def create(self, name, email):
         customer = Customer(id="123", name=name, email=email, addresses=[])
-        self.customers[customer.id] = customer
+        self.customers.append(customer)
         return customer
     
     def list(self):
