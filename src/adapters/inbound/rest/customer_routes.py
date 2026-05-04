@@ -1,63 +1,62 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
 from uuid import UUID
-from src.infrastructure.db.dependencies import get_db
-from src.adapters.outbound.db.customer_repository_impl import CustomerRepositoryImpl
-from src.adapters.outbound.db.address_repository_impl import AddressRepositoryImpl
+from sqlalchemy.orm import Session
+from src.adapters.outbound.db.dependencies import (
+    get_db,
+    get_customer_service,
+    get_customer_aggregate_service
+)
+from src.adapters.outbound.db.unit_of_work import UnitOfWork
 from src.application.services.customer_service import CustomerService
 from src.application.services.customer_aggregate_service import CustomerAggregateService
-from src.adapters.inbound.rest.schemas import ( CustomerResponse,
-                                                CustomerCreateRequest,
-                                                AddressResponse,
-                                                CustomerAddressCreateRequest,
-                                                CustomerDetailResponse)
-from src.infrastructure.db.unit_of_work import UnitOfWork
+from src.adapters.inbound.rest.schemas import (
+    CustomerResponse,
+    CustomerCreateRequest,
+    AddressResponse,
+    CustomerAddressCreateRequest,
+    CustomerDetailResponse
+)
 
 router = APIRouter()
 
-@router.post("/customers", response_model=CustomerResponse, summary="Create a new customer")
+
+@router.post("/customers", response_model=CustomerResponse, status_code=201)  # ← 200 para 201
 def create_customer_route(
     data: CustomerCreateRequest,
+    service: CustomerService = Depends(get_customer_service),
     db: Session = Depends(get_db)
 ):
-    service = CustomerService(
-        CustomerRepositoryImpl(db)
-    )
-
     with UnitOfWork(db):
         result = service.create_customer(data.name, data.email)
-
     return CustomerResponse.model_validate(result)
 
-@router.get("/customers", response_model=list[CustomerResponse], summary="List all customers")
-def list_customer_route(db:Session = Depends(get_db)):
-    service = CustomerService(CustomerRepositoryImpl(db))
-    customers = service.list_customer()
 
+@router.get("/customers", response_model=list[CustomerResponse])
+def list_customer_route(
+    service: CustomerService = Depends(get_customer_service)
+):
+    customers = service.list_customer()
     return [CustomerResponse.model_validate(c) for c in customers]
 
-@router.post("/customers/{customer_id}/addresses", summary="Add an address to a customer",response_model=AddressResponse)
-def add_address(customer_id: UUID, data: CustomerAddressCreateRequest, db: Session = Depends(get_db)):
-    customer_repository = CustomerRepositoryImpl(db)
-    address_repository = AddressRepositoryImpl(db)
-    service = CustomerAggregateService(customer_repository, address_repository)
 
+@router.post("/customers/{customer_id}/addresses", response_model=AddressResponse, status_code=201)  # ← 200 para 201
+def add_address(
+    customer_id: UUID,
+    data: CustomerAddressCreateRequest,
+    service: CustomerAggregateService = Depends(get_customer_aggregate_service),
+    db: Session = Depends(get_db)
+):
     with UnitOfWork(db):
-
         result = service.add_address_to_customer(
-            customer_id,
-            data.street,
-            data.city,
-            data.state,
-            data.zip_code
+            customer_id, data.street, data.city, data.state, data.zip_code
         )
-
     return AddressResponse.model_validate(result)
 
-@router.get("/customers/{customer_id}", response_model=CustomerDetailResponse, summary="Get customer by id")
-def get_customer_route(customer_id: UUID, db: Session = Depends(get_db)):
-    service = CustomerService(CustomerRepositoryImpl(db))
-    customer= service.get_customer(customer_id)
 
+@router.get("/customers/{customer_id}", response_model=CustomerDetailResponse)
+def get_customer_route(
+    customer_id: UUID,
+    service: CustomerService = Depends(get_customer_service)
+):
+    customer = service.get_customer(customer_id)
     return CustomerDetailResponse.model_validate(customer)

@@ -1,4 +1,4 @@
-from src.infrastructure.db.session import SessionLocal
+from src.adapters.outbound.db.session import SessionLocal
 from src.adapters.outbound.db.models import CustomerModel
 
 def create_customer (name: str, email: str):

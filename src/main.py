@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from src.domain.exceptions import (CustomerNotFoundError, EmailAlreadyExistsError, InvalidZipCodeError)
 from src.adapters.inbound.rest.customer_routes import router as customer_router
 from contextlib import asynccontextmanager
-from src.infrastructure.db.init_db import test_db_connection
+from src.adapters.outbound.db.init_db import verify_db_connection
 
 
 app = FastAPI()

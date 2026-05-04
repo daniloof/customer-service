@@ -1,13 +1,14 @@
+from __future__ import annotations
 from uuid import UUID
-from .address import Address
+from typing import List
 
 class Customer:
-    def __init__(self, id: UUID, name: str, email: str, addresses: None):
-        if not name:
+    def __init__(self, id: UUID, name: str, email: str, addresses: List[Address] | None = None):
+        if not name or not name.strip():  # ← adicionado .strip()
             raise ValueError("Name is required")
 
         self.id = id
-        self.name = name
+        self.name = name.strip()  # ← salva sem espaços extras
         self.email = email
         self.addresses = addresses or []
     

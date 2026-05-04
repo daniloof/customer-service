@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-class CustomerRepository (ABC):
+class CustomerRepository(ABC):
     @abstractmethod
-    def create(self, name:str, email:str):
+    def create(self, name: str, email: str):
         pass
 
     @abstractmethod
@@ -15,5 +15,5 @@ class CustomerRepository (ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, customer_id):
+    def get_by_email(self, email: str):  # ← adicionado
         pass

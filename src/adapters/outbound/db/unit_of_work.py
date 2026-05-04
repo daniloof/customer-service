@@ -16,3 +16,4 @@ class UnitOfWork:
             self.rollback()
         else:
             self.commit()
+        self.db.close()

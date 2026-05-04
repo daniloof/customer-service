@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from src.main import app
-from src.infrastructure.db.dependencies import get_db
+from src.adapters.outbound.db.dependencies import get_db 
 from tests.test_database import TestingSessionLocal
 from uuid import uuid4
 
@@ -18,7 +18,7 @@ client = TestClient(app)
 def test_create_customer_api():
     unique_email = f"{uuid4()}@example.com"
     response = client.post("/customers/", json={"name": "John Doe", "email": unique_email})
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     data = response.json()
     assert data["name"] == "John Doe"
@@ -36,7 +36,7 @@ def test_create_customer_duplicate_email():
         }
     )
 
-    assert first_response.status_code == 200
+    assert first_response.status_code == 201
 
     second_response = client.post(
         "/customers/",
@@ -64,7 +64,7 @@ def test_add_address_api():
         }
     )
 
-    assert customer_response.status_code == 200, customer_response.json()
+    assert customer_response.status_code == 201, customer_response.json()
 
     customer_id = customer_response.json()["id"]
 
@@ -78,7 +78,7 @@ def test_add_address_api():
         }
     )
 
-    assert response.status_code == 200, response.json()
+    assert response.status_code == 201, response.json()
 
     data = response.json()
 
