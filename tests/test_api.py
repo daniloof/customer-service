@@ -136,3 +136,28 @@ def test_add_address_invalid_zip():
     data = response.json()
 
     assert "detail" in data
+
+def test_get_customer_invalid_uuid():
+    response = client.get("/customers/id-inexistente")
+    assert response.status_code == 422  # ← UUID inválido, rejeitado pelo Pydantic
+
+def test_get_customer_not_found():
+    response = client.get("/customers/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404  # ← UUID válido mas não existe no banco
+
+def test_list_customers_empty():
+    response = client.get("/customers")
+    assert response.status_code == 200
+    assert response.json() == []
+
+def test_list_addresses_by_customer():
+    # cria cliente
+    customer = client.post("/customers", json={"name": "John", "email": "john@example.com"}).json()
+    # adiciona endereço
+    client.post(f"/customers/{customer['id']}/addresses", json={
+        "street": "Rua A", "city": "SP", "state": "SP", "zip_code": "09000000"
+    })
+    # lista endereços via GET /customers/{id}
+    response = client.get(f"/customers/{customer['id']}")
+    assert response.status_code == 200
+    assert len(response.json()["addresses"]) == 1

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from uuid import UUID
 from typing import List
+from .address import Address
 
 class Customer:
     def __init__(self, id: UUID, name: str, email: str, addresses: List[Address] | None = None):

@@ -15,5 +15,5 @@ class CustomerRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_email(self, email: str):  # ← adicionado
+    def get_by_email(self, email: str):
         pass
