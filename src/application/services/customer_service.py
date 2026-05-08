@@ -52,3 +52,22 @@ class CustomerService:
                 for a in customer.addresses
             ]
         )
+    
+    def update_customer(self, customer_id, name: str, email: str):  # ← novo
+        customer = self.repository.get_by_id(customer_id)
+        if not customer:
+            raise CustomerNotFoundError(customer_id)
+
+        # Verifica se o novo email já pertence a outro cliente
+        existing = self.repository.get_by_email(email)
+        if existing and str(existing.id) != str(customer_id):
+            raise EmailAlreadyExistsError(email)
+
+        updated = self.repository.update(customer_id, name, email)
+        return CustomerDTO(id=updated.id, name=updated.name, email=updated.email)
+
+    def delete_customer(self, customer_id):  # ← novo
+        customer = self.repository.get_by_id(customer_id)
+        if not customer:
+            raise CustomerNotFoundError(customer_id)
+        self.repository.delete(customer_id)

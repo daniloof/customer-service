@@ -1,7 +1,7 @@
 from src.domain.entities import Address
 from src.domain.ports.customer_repository import CustomerRepository
 from src.domain.ports.address_repository import AddressRepository
-from src.domain.exceptions import CustomerNotFoundError
+from src.domain.exceptions import CustomerNotFoundError, AddressNotFoundError
 
 class CustomerAggregateService:
     def __init__(
@@ -42,3 +42,14 @@ class CustomerAggregateService:
                                                zip_code)
 
         return saved
+    
+    def delete_address(self, customer_id, address_id):  # ← novo
+        customer = self.customer_repository.get_by_id(customer_id)
+        if not customer:
+            raise CustomerNotFoundError(customer_id)
+
+        address = self.address_repository.get_by_id(address_id)
+        if not address:
+            raise AddressNotFoundError(address_id)
+
+        self.address_repository.delete(address_id)

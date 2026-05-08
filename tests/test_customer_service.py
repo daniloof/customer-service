@@ -1,7 +1,7 @@
 from src.application.services.customer_service import CustomerService
 from tests.fakes import FakeCustomerRepository
 import pytest
-from src.domain.exceptions import CustomerNotFoundError
+from src.domain.exceptions import CustomerNotFoundError, EmailAlreadyExistsError
 
 def test_create_customer():
     repo = FakeCustomerRepository()
@@ -38,3 +38,39 @@ def test_get_customer_not_found():
 
     with pytest.raises(CustomerNotFoundError):
         service.get_customer("id-not-found")
+
+def test_update_customer():  # ← novo
+    repo = FakeCustomerRepository()
+    service = CustomerService(repo)
+    created = service.create_customer("John", "john@example.com")
+    result = service.update_customer(created.id, "John Updated", "john.updated@example.com")
+    assert result.name == "John Updated"
+    assert result.email == "john.updated@example.com"
+
+def test_update_customer_not_found():  # ← novo
+    repo = FakeCustomerRepository()
+    service = CustomerService(repo)
+    with pytest.raises(CustomerNotFoundError):
+        service.update_customer("id-inexistente", "John", "john@example.com")
+
+def test_update_customer_duplicate_email():  # ← novo
+    repo = FakeCustomerRepository()
+    service = CustomerService(repo)
+    service.create_customer("John", "john@example.com")
+    jane = service.create_customer("Jane", "jane@example.com")
+    with pytest.raises(EmailAlreadyExistsError):
+        service.update_customer(jane.id, "Jane", "john@example.com")
+
+def test_delete_customer():  # ← novo
+    repo = FakeCustomerRepository()
+    service = CustomerService(repo)
+    created = service.create_customer("John", "john@example.com")
+    service.delete_customer(created.id)
+    with pytest.raises(CustomerNotFoundError):
+        service.get_customer(created.id)
+
+def test_delete_customer_not_found():  # ← novo
+    repo = FakeCustomerRepository()
+    service = CustomerService(repo)
+    with pytest.raises(CustomerNotFoundError):
+        service.delete_customer("id-not-found")

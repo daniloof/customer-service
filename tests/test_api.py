@@ -161,3 +161,76 @@ def test_list_addresses_by_customer():
     response = client.get(f"/customers/{customer['id']}")
     assert response.status_code == 200
     assert len(response.json()["addresses"]) == 1
+
+def test_update_customer():
+    # cria
+    response = client.post("/customers", json={"name": "John", "email": "john@example.com"})
+    customer_id = response.json()["id"]
+
+    # atualiza
+    response = client.put(f"/customers/{customer_id}", json={
+        "name": "John Updated",
+        "email": "john.updated@example.com"
+    })
+    assert response.status_code == 200
+    assert response.json()["name"] == "John Updated"
+    assert response.json()["email"] == "john.updated@example.com"
+
+def test_update_customer_not_found():
+    response = client.put(
+        "/customers/00000000-0000-0000-0000-000000000000",
+        json={"name": "John", "email": "john@example.com"}
+    )
+    assert response.status_code == 404
+
+def test_update_customer_duplicate_email():
+    client.post("/customers", json={"name": "John", "email": "john@example.com"})
+    jane = client.post("/customers", json={"name": "Jane", "email": "jane@example.com"})
+    jane_id = jane.json()["id"]
+
+    response = client.put(f"/customers/{jane_id}", json={
+        "name": "Jane",
+        "email": "john@example.com"  # email já existe
+    })
+    assert response.status_code == 409
+
+def test_delete_customer():
+    response = client.post("/customers", json={"name": "John", "email": "john@example.com"})
+    customer_id = response.json()["id"]
+
+    response = client.delete(f"/customers/{customer_id}")
+    assert response.status_code == 204
+
+    # confirma que foi deletado
+    response = client.get(f"/customers/{customer_id}")
+    assert response.status_code == 404
+
+def test_delete_customer_not_found():
+    response = client.delete("/customers/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+
+def test_delete_address():
+    # cria cliente
+    customer = client.post("/customers", json={"name": "John", "email": "john@example.com"}).json()
+    customer_id = customer["id"]
+
+    # adiciona endereço
+    address = client.post(f"/customers/{customer_id}/addresses", json={
+        "street": "Rua A", "city": "SP", "state": "SP", "zip_code": "09000000"
+    }).json()
+    address_id = address["id"]
+
+    # deleta endereço
+    response = client.delete(f"/customers/{customer_id}/addresses/{address_id}")
+    assert response.status_code == 204
+
+    # confirma que foi deletado
+    response = client.get(f"/customers/{customer_id}")
+    assert response.status_code == 200
+    assert len(response.json()["addresses"]) == 0
+
+def test_delete_address_customer_not_found():
+    response = client.delete(
+        "/customers/00000000-0000-0000-0000-000000000000/addresses/00000000-0000-0000-0000-000000000001"
+    )
+    assert response.status_code == 404    

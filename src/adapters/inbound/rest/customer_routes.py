@@ -14,11 +14,11 @@ from src.adapters.inbound.rest.schemas import (
     CustomerCreateRequest,
     AddressResponse,
     CustomerAddressCreateRequest,
-    CustomerDetailResponse
+    CustomerDetailResponse,
+    CustomerUpdateRequest
 )
 
 router = APIRouter()
-
 
 @router.post("/customers", response_model=CustomerResponse, status_code=201)  # ← 200 para 201
 def create_customer_route(
@@ -60,3 +60,33 @@ def get_customer_route(
 ):
     customer = service.get_customer(customer_id)
     return CustomerDetailResponse.model_validate(customer)
+
+@router.put("/customers/{customer_id}", response_model=CustomerResponse)  # ← novo
+def update_customer_route(
+    customer_id: UUID,
+    data: CustomerUpdateRequest,
+    service: CustomerService = Depends(get_customer_service),
+    db: Session = Depends(get_db)
+):
+    with UnitOfWork(db):
+        result = service.update_customer(customer_id, data.name, data.email)
+    return CustomerResponse.model_validate(result)
+
+@router.delete("/customers/{customer_id}", status_code=204)  # ← novo
+def delete_customer_route(
+    customer_id: UUID,
+    service: CustomerService = Depends(get_customer_service),
+    db: Session = Depends(get_db)
+):
+    with UnitOfWork(db):
+        service.delete_customer(customer_id)
+
+@router.delete("/customers/{customer_id}/addresses/{address_id}", status_code=204)  # ← novo
+def delete_address_route(
+    customer_id: UUID,
+    address_id: UUID,
+    service: CustomerAggregateService = Depends(get_customer_aggregate_service),
+    db: Session = Depends(get_db)
+):
+    with UnitOfWork(db):
+        service.delete_address(customer_id, address_id)

@@ -26,10 +26,27 @@ class CustomerRepositoryImpl(CustomerRepository):
             return None
         return to_domain(model)
 
-    def get_by_email(self, email: str):  # ← adicionado
+    def get_by_email(self, email: str): 
         model = self.db.query(CustomerModel).filter(
             CustomerModel.email == email
         ).first()
         if not model:
             return None
         return to_domain(model)
+    
+    def update(self, customer_id, name: str, email: str):
+        model = self.db.query(CustomerModel).filter(
+            CustomerModel.id == customer_id
+        ).first()
+        model.name = name
+        model.email = email
+        self.db.flush()
+        self.db.refresh(model)
+        return to_domain(model)
+
+    def delete(self, customer_id): 
+        model = self.db.query(CustomerModel).filter(
+            CustomerModel.id == customer_id
+        ).first()
+        self.db.delete(model)
+        self.db.flush()
