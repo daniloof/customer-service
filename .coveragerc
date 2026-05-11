@@ -8,3 +8,4 @@ omit =
     src/domain/exceptions/*
     src/adapters/outbound/db/init_db.py
     */__init__.py
+    src/infrastructure/db/init_db.py

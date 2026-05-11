@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends
 from uuid import UUID
 from sqlalchemy.orm import Session
-from src.adapters.outbound.db.dependencies import (
+from src.infrastructure.db.dependencies import (
     get_db,
     get_customer_service,
     get_customer_aggregate_service
-)
-from src.adapters.outbound.db.unit_of_work import UnitOfWork
+) 
+from src.infrastructure.db.unit_of_work import UnitOfWork
 from src.application.services.customer_service import CustomerService
 from src.application.services.customer_aggregate_service import CustomerAggregateService
 from src.adapters.inbound.rest.schemas import (

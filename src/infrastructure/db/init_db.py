@@ -1,5 +1,5 @@
 from sqlalchemy import text
-from src.adapters.outbound.db.session import engine
+from src.infrastructure.db.session import engine
 
 def verify_db_connection():
     try:

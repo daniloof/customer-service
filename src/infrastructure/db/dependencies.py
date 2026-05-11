@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from src.adapters.outbound.db.session import SessionLocal
+from src.infrastructure.db.session import SessionLocal
 from src.adapters.outbound.db.customer_repository_impl import CustomerRepositoryImpl
 from src.adapters.outbound.db.address_repository_impl import AddressRepositoryImpl
 from src.application.services.customer_service import CustomerService

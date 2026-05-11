@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from src.main import app
-from src.adapters.outbound.db.dependencies import get_db 
+from src.infrastructure.db.dependencies import get_db 
 from tests.test_database import TestingSessionLocal
 from uuid import uuid4
 
