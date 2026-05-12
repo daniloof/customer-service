@@ -32,3 +32,12 @@ class CustomerModel(Base):
     created_at = Column(DateTime(timezone=True),server_default=func.now())
 
     addresses = relationship("AddressModel",back_populates="customer", cascade="all, delete-orphan")
+
+class UserModel(Base):
+    __tablename__ = "users"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    google_id = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

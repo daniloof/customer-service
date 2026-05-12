@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from src.domain.exceptions import (CustomerNotFoundError, EmailAlreadyExistsError, InvalidZipCodeError)
+from src.domain.exceptions import (CustomerNotFoundError, EmailAlreadyExistsError, InvalidZipCodeError, ValidationError)
 from src.adapters.inbound.rest.customer_routes import router as customer_router
 from contextlib import asynccontextmanager
 from src.infrastructure.db.init_db import verify_db_connection
@@ -27,5 +27,11 @@ async def invalid_zip_code_exception_handler(request: Request, exc: InvalidZipCo
         status_code=400,
         content={"detail": str(exc)}
     )
+
+@app.exception_handler(ValidationError)
+async def validation_error_handler(request: Request, exc: ValidationError):
+    return JSONResponse(
+        status_code=400,
+        content={"detail": str(exc)})
 
 app.include_router(customer_router)
